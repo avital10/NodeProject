@@ -17,6 +17,6 @@ app.use("/api/order", orderRouter)
 app.use("/api/user", userRouter)
 app.use("/api/product", productRouter)
 let port = process.env.PORT;
-app.listen(port, () => {
+app.listen(4040, () => {
     console.log("app is listen on port " + port)
 })

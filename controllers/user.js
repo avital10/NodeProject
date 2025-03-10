@@ -29,7 +29,7 @@ export async function updatePassword(req, res) {
     let { id } = req.params;
     let body = req.body;
     if (!body.password || body.userName || body.email)
-      return  res.status(404).json({ title: "only update password", message: "cannot update email userName" })
+        return res.status(404).json({ title: "only update password", message: "cannot update email userName" })
     try {
         let data = await userModel.findByIdAndUpdate(id, { password: body.password }, { new: true });
         if (!data) return res.status(404).json({ title: "cannot update by id", message: "user with such id not found" });
@@ -44,7 +44,7 @@ export const update = async (req, res) => {
     let { id } = req.params;
     let body = req.body;
     if (body.password)
-      return  res.status(404).json({ title: "cannot update password", message: "cannot update here password" })
+        return res.status(404).json({ title: "cannot update password", message: "cannot update here password" })
     try {
         let data = await userModel.findByIdAndUpdate(id, body, { new: true }).select('-password');
         if (!data) return res.status(404).json({ title: "cannot update by id", message: "user with such id not found" });
@@ -58,8 +58,11 @@ export const update = async (req, res) => {
 export async function add_signUp(req, res) {
     let { body } = req;
     if (!body.password || !body.email)
-      return  res.status(400).json({ title: "cannot add user", message: "password, email are require" })
+        return res.status(400).json({ title: "cannot add user", message: "password, email are require" })
     try {
+        let exist = await userModel.findOne({ email: body.email });
+        if (exist != null)
+            return res.status(400).json({ title: "cannot add user", message: "this user is exist" })
         let newUser = new userModel(body);
         await newUser.save();
         res.json(newUser);
