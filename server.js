@@ -11,11 +11,14 @@ import cors from "cors"
 dotenv.config();
 const app = express();
 connectToDb();
+
 app.use(cors());
 app.use(express.json())
+
 app.use("/api/order", orderRouter)
 app.use("/api/user", userRouter)
 app.use("/api/product", productRouter)
+
 let port = process.env.PORT;
 app.listen(4040, () => {
     console.log("app is listen on port " + port)

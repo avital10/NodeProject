@@ -3,12 +3,9 @@ let verify = jwt.verify;
 
 export function isUserIn(req, res, next) {
     if (!req.headers.authorization)
-
         return res.status(401).json({ title: "מתשמש לא רשום", message: "קודם בצע כניסה או הרשמה" })
     let authorization = req.headers.authorization;
     try {
-
-
         let result = verify(authorization, process.env.SECRET_KEY);
         req.u = result;
         return next()
@@ -30,7 +27,7 @@ export function isUserManager(req, res, next) {
         req.u = result;
         console.log(result);
         
-        if (result.role != "MANAGER")
+        if (result.role != "admin")
             return res.status(403).json({ title: "אין לך רשות לפבצע פעולה זו", message: "נדרשת השראת מנהל...." })
         return next()
     }
