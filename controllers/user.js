@@ -110,7 +110,7 @@ export async function getUserByuserNamePassword_Login(req, res) {
     
     try {
         if (!req.body.password || !req.body.email)
-            return res.status(404).json({ title: "miising username or password", message: "missing" });
+            return res.status(404).json({ title: "miising email or password", message: "missing" });
         let data = await userModel.findOne({ email: req.body.email }).lean();
         if (!data) {
             return res.status(404).json({ title: "no such user", message: "cannot found user with such email" });
