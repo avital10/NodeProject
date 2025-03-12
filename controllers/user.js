@@ -57,42 +57,75 @@ export const update = async (req, res) => {
 
 export async function add_signUp(req, res) {
     let { body } = req;
+    console.log(body);
+
     if (!body.password || !body.email)
-        return res.status(400).json({ title: "cannot add user", message: "password, email are require" })
+        return res.status(400).json({ title: "cannot add user", message: "password, email are required" });
+    //תקינות מjoy 
+    let validate = validateUser(req.body);
+    if (validate.error)
+        return res.status(400).json(validate.error.details[0].message);
+
+    // בדיקת תקינות הסיסמה
+    // const passwordRegex = /^(?=.[A-Z])(?=.[a-z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+    // if (!passwordRegex.test(body.password)) {
+    //     return res.status(400).json({
+    //         title: "invalid password",
+    //         message: "Password must be at least 8 characters long and include one uppercase letter⏮️, one lowercase letter, one number, and one special character."
+    //     });
+    // }
+
+    //בדיקה על מייל שהוא יחודי
+    let exist = await userModel.findOne({ email: body.email });
+    if (exist)
+        return res.status(409).json({ title: "cannot add user", message: "thid email alrday exist" });
+
+
+
     try {
-        let exist = await userModel.findOne({ email: body.email });
-        if (exist != null)
-            return res.status(400).json({ title: "cannot add user", message: "this user is exist" })
-        let newUser = new userModel(body);
+
+
+
+        // הצפנת הסיסמה לפני שמירת המשתמש
+        const hashedPassword = await bcrypt.hash(body.password, 10);
+
+
+        // שמירה של המשתמש עם הסיסמה המוצפנת
+        let newUser = new userModel({ ...body, password: hashedPassword });
         await newUser.save();
-        res.json(newUser);
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).json({ title: "cannot add this user", message: err.message })
+
+        let token = generateToken(newUser);
+
+        res.json({ ...newUser, token });
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ title: "cannot add this user", message: err.message });
     }
 }
 
 export async function getUserByuserNamePassword_Login(req, res) {
     try {
-        let data = await userModel.findOne({
-            password: req.body.password,
-            userName: req.body.userName
-        }).select('-password');
-
+        if (!req.body.password || !req.body.email)
+            return res.status(404).json({ title: "miising username or password", message: "missing" });
+        let data = await userModel.findOne({ email: req.body.email }).lean();
         if (!data) {
-            return res.status(404).json({
-                title: "cannot find user with such details",
-                message: "wrong userName or password"
-            });
+            return res.status(404).json({ title: "no such user", message: "cannot found user with such email" });
         }
 
-        res.json(data);
-    } catch (err) {
+        let verifyPassword = await bcrypt.compare(req.body.password, data.password);
+        if (!verifyPassword)
+            return res.status(404).json({ title: "cannot found user with such deatekies", message: "worng password" });
+
+        let token = generateToken({ ...data });
+
+        let { password, ...other } = data;
+
+        other.token = token;
+        console.log(other);
+        res.json(other);
+    }
+    catch (err) {
         console.log(err);
-        res.status(400).json({
-            title: "cannot log in user",
-            message: err.message
-        });
+        res.status(400).json({ title: "cannot log in user", message: err.message });
     }
 }
