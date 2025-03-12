@@ -1,4 +1,7 @@
-import { userModel } from "../models/user.js";
+import { userModel, validateUser } from "../models/user.js";
+import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateataoken.js";
+
 
 export async function getAllUsers(req, res) {
     try {
@@ -96,7 +99,7 @@ export async function add_signUp(req, res) {
 
         let token = generateToken(newUser);
 
-        res.json({ ...newUser, token });
+        res.json({ ...newUser.toObject(), token });
     } catch (err) {
         console.log(err);
         res.status(400).json({ title: "cannot add this user", message: err.message });
@@ -104,6 +107,7 @@ export async function add_signUp(req, res) {
 }
 
 export async function getUserByuserNamePassword_Login(req, res) {
+    
     try {
         if (!req.body.password || !req.body.email)
             return res.status(404).json({ title: "miising email or password", message: "missing" });
