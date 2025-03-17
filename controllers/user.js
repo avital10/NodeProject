@@ -69,25 +69,12 @@ export async function add_signUp(req, res) {
     if (validate.error)
         return res.status(400).json(validate.error.details[0].message);
 
-    // בדיקת תקינות הסיסמה
-    // const passwordRegex = /^(?=.[A-Z])(?=.[a-z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-    // if (!passwordRegex.test(body.password)) {
-    //     return res.status(400).json({
-    //         title: "invalid password",
-    //         message: "Password must be at least 8 characters long and include one uppercase letter⏮️, one lowercase letter, one number, and one special character."
-    //     });
-    // }
-
     //בדיקה על מייל שהוא יחודי
     let exist = await userModel.findOne({ email: body.email });
     if (exist)
         return res.status(409).json({ title: "cannot add user", message: "thid email alrday exist" });
 
-
-
     try {
-
-
 
         // הצפנת הסיסמה לפני שמירת המשתמש
         const hashedPassword = await bcrypt.hash(body.password, 10);
