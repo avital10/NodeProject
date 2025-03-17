@@ -17,8 +17,8 @@ export function isUserIn(req, res, next) {
 }
 export function isUserManager(req, res, next) {
     if (!req.headers.authorization)
-
         return res.status(401).json({ title: "מתשמש לא רשום", message: "קודם בצע כניסה או הרשמה" })
+    
     let authorization = req.headers.authorization;
     try {
 
@@ -29,7 +29,7 @@ export function isUserManager(req, res, next) {
         
         if (result.role != "admin")
             return res.status(403).json({ title: "אין לך רשות לפבצע פעולה זו", message: "נדרשת השראת מנהל...." })
-        return next()
+     next()
     }
     catch (err) {
         return res.status(401).json({ title: "מתשמש לא רשום", message: "קודם בצע כניסה או הרשמה" + err.message })
