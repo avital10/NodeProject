@@ -5,9 +5,9 @@ import { isUserManager } from "../Middlewares/isUserIn.js";
 const router=Router();
 router.get("/",getAllproduct);
 router.get("/:id",getById);
-router.delete("/:id",deleteById);
+router.delete("/:id",isUserManager,deleteById);
 router.post("/",isUserManager, add);
-router.put("/:id",update);
+router.put("/:id",isUserManager,update);
 
 export default router;
 
