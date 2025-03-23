@@ -15,7 +15,7 @@ export const getAllOrders = async (req, res) => {
 //הוספת הזמנה
 export const addOrder = async (req, res) => {
     let { body } = req;
-    if (!body.address || !body.product.length || !body.userId)
+    if (!body.address || !body.product || !body.userId)
        return res.status(404).json({ title: "cannot add order", message: "address,product,userId are require" })
     try {
         let user = await userModel.findById(body.userId);
